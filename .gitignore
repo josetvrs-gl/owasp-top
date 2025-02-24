@@ -1,0 +1,60 @@
+# Byte-compiled / cached files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+
+# Virtual environment
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# Environment variables & secrets
+*.env
+config.py
+instance/
+*.sqlite3
+*.db
+*.sqlite
+
+# Logs & debug
+logs/
+*.log
+debug.log
+
+# Compiled files
+*.out
+*.o
+*.so
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.bak
+
+# Docker & Deployment
+docker-compose.override.yml
+.env.production
+.env.development
+
+# Jupyter Notebooks (if used)
+.ipynb_checkpoints/
+
+# Node modules (if using frontend in Flask)
+node_modules/
+npm-debug.log
+
+# Flask-specific
+instance/
+*.pid
+.werkzeug/
+
+# Ignore coverage reports
+htmlcov/
+.coverage
+coverage.xml
