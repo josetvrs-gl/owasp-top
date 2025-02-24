@@ -1,16 +1,34 @@
 Inyección SQL
-El login page es vulnerable a ataques de inyección SQL
-Probar los siguientes ejemplos:
-A. Esto iniciará sesión con la primer cuenta en la tabla users
-    username: ' OR 1=1 --
-    password: lo que sea
-    SELECT * FROM users WHERE username = '' OR '1'='1' AND password = 'anything'
-B. Checar directamente si existe una cuenta admin
-    usename: admin' --
-    password: (blank)
-    SELECT * FROM users WHERE username = 'admin' -- ' AND password = ''
-C. Eliminar la tabla usuarios (si se prueba, reiniciar la aplicación)
-    Username: admin'; DROP TABLE users; --
-    Password: (leave blank)
-    SELECT * FROM users WHERE username = 'admin'; DROP TABLE users; -- ' AND password = ''
-* La solución hace que los inputs (username, password), sean tratados como inputs y no como código SQL directamente *
+    El login page es vulnerable a ataques de inyección SQL
+    Probar los siguientes ejemplos:
+    A. Esto iniciará sesión con la primer cuenta en la tabla users, en este caso es admin
+        username: ' OR 1=1 --
+        password: lo que sea
+        SELECT * FROM users WHERE username = '' OR '1'='1' AND password = 'anything'
+    B. Iniciar sesión como cualquier usuario sin necesidad de credenciales
+        usename: admin' -- (aquí se puede cambiar admin por un usuario existente como guest)
+        password: lo qu sea
+        SELECT * FROM users WHERE username = 'admin' -- ' AND password = ''
+    C. Eliminar la tabla usuarios (no funciona)
+        Username: admin'; DROP TABLE users; --
+        Password: (leave blank)
+        SELECT * FROM users WHERE username = 'admin'; DROP TABLE users; -- ' AND password = ''
+
+    SOLUCIÓN:
+    Esto trata a username y password como inputs cuando se ejecuta el query, en lugar de concatenarse y tratase como código
+    query = "SELECT * FROM users WHERE username = ? AND password = ?"
+    cursor.execute(query, (username, password))
+
+Autorización
+    Se puede mostrar información a un usuario que no debería tener acceso a ella
+    Esto al modificar la URL, por ejemplo para ver el perfil de usuario de alguien más
+    También hay algunas rutas que deberían estar protegidas, por ejemplo el administrador es el unico que puede listar todos los usuarios
+
+Contraseñas Inseguras
+    El signup no hace ninguna validación de contraseñas, puede ser cualquier cosa.
+    Se creó una funcion para validar las contraseñas en app/utils/passwords.py que regresa un boleano
+
+Fallas criptográficas
+    Las contraseñas son guardadas en la base de datos como texto plano
+    Se implementará una forma de hashear la contraseñas
+    Una idea es implementar un algoritmo debil y mostrar como se puede hackear una contraseña
