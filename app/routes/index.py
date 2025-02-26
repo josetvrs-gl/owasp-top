@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template_string, redirect, url_for, session
+from flask import Blueprint, render_template, redirect, url_for, session
 from app.db import get_db_connection
 import json
 
@@ -22,17 +22,4 @@ def home():
         is_admin = True
     
     conn.close()
-    return render_template_string('''
-        <h1>Welcome, {{ data }}</h1>
-        <form action="{{ url_for('users.profile', user_id=session['user_id']) }}" method="GET">
-            <button type="submit">Profile</button>
-        </form>
-        {% if is_admin %}
-        <form action="{{ url_for('users.all_users') }}" method="GET">
-            <button type="submit">All Users</button>
-        </form>
-        {% endif %}
-        <form action="{{ url_for('auth.logout') }}" method="POST">
-            <button type="submit">Logout</button>
-        </form>
-    ''', data=user_name, is_admin=is_admin)
+    return render_template('index.html', data=user_name, is_admin=is_admin)

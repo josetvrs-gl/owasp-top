@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, request, render_template_string
+from flask import Blueprint, request, render_template
 
 ping = Blueprint('ping', __name__)
 
@@ -10,11 +10,4 @@ def ping_ip():
         target = request.form['target']  # User input
         output = os.popen(f"ping -c 3 {target}").read()  # VULNERABLE
 
-    return render_template_string('''
-        <h1>Ping a Server</h1>
-        <form method="POST">
-            <input type="text" name="target" placeholder="Enter IP or Domain" required><br>
-            <input type="submit" value="Ping">
-        </form>
-        <pre>{{ output }}</pre>
-    ''', output=output)
+    return render_template('ping/ipping.html', output=output)

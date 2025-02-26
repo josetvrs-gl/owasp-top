@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template_string, redirect, url_for, session
+from flask import Blueprint, request, render_template_string, redirect, url_for, session, render_template
 from app.db import get_db_connection
 from app.utils.passwords import is_valid_password
 import json
@@ -16,7 +16,6 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
         conn = get_db_connection()
         cursor = conn.cursor()
         
@@ -38,14 +37,7 @@ def login():
         else:
             message = "Invalid credentials!"
     
-    return render_template_string('''
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required><br>
-            <input type="password" name="password" placeholder="Password" required><br>
-            <input type="submit" value="Login">
-        </form>
-        <p>{{ message }}</p>
-    ''', message=message)
+    return render_template('auth/login.html',  message=message)
     
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -76,14 +68,7 @@ def signup():
             return redirect(url_for('auth.login'))
         conn.close()
     
-    return render_template_string('''
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required><br>
-            <input type="password" name="password" placeholder="Password" required><br>
-            <input type="submit" value="Sign Up">
-        </form>
-        <p>{{ message }}</p>
-    ''', message=message)
+    return render_template('auth/signup.html', message=message)
 
 
 

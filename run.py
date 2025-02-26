@@ -9,7 +9,7 @@ from app.db import init_db
 init_db()
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='app/templates')
     app.secret_key = "oc856vw8965wn4f57o82c5v285"
     app.register_blueprint(index, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth')

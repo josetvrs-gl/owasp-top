@@ -23,7 +23,7 @@ def leak_cards():
 
     # Mostrar tarjetas en texto claro (porque la BD las descifra automáticamente)
     return render_template_string('''
-        <h1>Credit Card Details</h1>
+        <h1 class="mb-5">Credit Card Details</h1>
         {% for card in cards %}
             <p>Card Number: {{ card['card_number'] }}</p>
             <p>Cardholder Name: {{ card['cardholder_name'] }}</p>

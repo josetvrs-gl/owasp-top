@@ -1,3 +1,4 @@
+DEMOS
 Inyección SQL
     El login page es vulnerable a ataques de inyección SQL
     Probar los siguientes ejemplos:
@@ -18,6 +19,12 @@ Inyección SQL
     Esto trata a username y password como inputs cuando se ejecuta el query, en lugar de concatenarse y tratase como código
     query = "SELECT * FROM users WHERE username = ? AND password = ?"
     cursor.execute(query, (username, password))
+
+Información Innecesaria mostrada al usuario
+    Si intentamos hace login y ponemos algun caracter no permitido por SQL, por ejemplo ponemos ' en la contraseña
+    Esto mostrará un error que puede mostrar mucha información acerca de la aplicación y que el atacante puede explotar
+    Como el framwork utilizado, la estructura de la aplicación, e incluso parte del código que provocó el error
+    Esto se soluciona utilizando try, catch o Try, Exception en python 
 
 Autorización
     Se puede mostrar información a un usuario que no debería tener acceso a ella
