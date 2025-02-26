@@ -1,17 +1,35 @@
-Esta aplicación busca mostrar algunas vulnerabilidades del top 10 de OWASP
+Sobre este proyecto:
+Esta aplicación busca mostrar algunas vulnerabilidades del top 10 de OWASP.
+Desarrollada en Flask y base de datos sqlite3
 
-Sobre la aplicación:
+Ejecución:
+* python -m venv venv
+* source venv/bin/activate
+* pip install -r requirements.txt
+* python run.py
 
-La aplicación esta desarrollada en flask y utiliza una base de datos sqlite.
+
 Al iniciar la aplicación, se crea una tabla de usuarios con la siguiente información:
 [('admin', 'password123'), ('guest', 'guest123'), ('jose', 'passwd432')"]
-La aplicación tiene rutas para login, logout, y signup dentro de /auth
-La aplicación permite ver el perfil del usuario en /users/<id> y permite al admin ver la lista de todos los usuarios en /users
+Rutas:
+* / -> Página de inicio
+
+* /auth/login
+* /auth/logout
+* /auth/signup
+
+* /users -> listado de usuarios
+* /users/<id> -> Perfile de usuario
+
+* /cards?user_id=<id> -> Listado de tarjetas de usuario
+
+* /ping -> Ejemplo de funcionalidad no segura (ping a servidor)
 
 Vulnerabilidades existentes:
-1. SQL Injection
-2. Bad Authentication
-3. Missing Sessions
-4. Command Injection
-5. Passwords
-6. Criptographic
+1. Inyección SQL
+2. Errores de autenticación
+3. Sesiones no invalidadas
+4. Inyección de comandos
+5. Constraseñas no seguras y en texto plano
+6. Encriptación de información sensible débil
+7. Errores exponiendo información innecesaria y sensible

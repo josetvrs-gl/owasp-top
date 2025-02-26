@@ -1,6 +1,5 @@
-from flask import Blueprint, request, render_template, redirect, url_for, session
+from flask import Blueprint, render_template, redirect, url_for, session
 from app.db import get_db_connection
-import json
 
 users = Blueprint('users', __name__)
 
@@ -22,7 +21,6 @@ def all_users():
 
 @users.route('/<int:user_id>')
 def profile(user_id):
-    # Handle user profile display here
     if not session:
         return redirect(url_for('auth.login'))
     # TO ONLY ALLOW THE USER THE SEE ITS OWN PROGILE
@@ -34,5 +32,4 @@ def profile(user_id):
     cursor.execute(query, (user_id,))
     user = cursor.fetchone()
     conn.close()
-        
     return render_template('users/profile.html', user=user)

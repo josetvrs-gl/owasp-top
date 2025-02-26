@@ -1,41 +1,152 @@
-DEMOS
-Inyección SQL
+OWASP TOP 10
+
+Primero explicar la aplicación, las rutas y lo que hace
+
+1. PÉRDIDA DE CONTROL DE ACCESO
+- Exposición de información sensible a un actor no autorizado
+- Exposición de información confidencial a través de datos enviados
+- Falsificación de peticiones en sitios cruzados (CSRF)
+    DEMO:
+    Los usuarios debería solo poder acceder a su información, como su perfil.
+        * Modificar id en url de usuarion "users/<id>" para ver información de otros usuarios
+    En caso de ser administrador, este puede ver la información de otros usuarios.
+        * Las contraseñas están expuestas en la tabla de usuarios
+    Información del servidor y de código esta expuesta
+        *  en login poner ' en contraseña, esto puede exponet información de la aplicación
+    Reutilizar un token de control de acceso (cookie) para elevar privilegios
+        * Copiar cookie de un usuario autenticado y utilizarlo cuando haya cerrado sesión
+    Eliminar, Editar datos no debe ser disponible para cualquier usuario
+
+2. FALLAS CRIPTOGRÁFICAS
+- Exposición de datos sensibles (contraseña no cifrada)
+- Algoritmos criptográficos no seguros o vulnerados o funciones hash obsoletas (MD5, SHA1)
+- Certificados y cadena de confianza
+- Entropía insuficiente
+- Contraseñas, variables de entorno, claves criptográficas incluidas en el código fuente
+- Transferencia de datos en texto claro (HTTP en lugar de HTTPS), no solamente entre cliente servidor pero entre dif. componentes
+    DEMO:
+    Las contraseñas no estan encriptadas y se guardaron en la Base de Datos en texto plano
+    * Encriptar las contraseñas en db.py cuando se crean, y cuando un usuario crea su cuenta (MD5, no seguro) hash_password_md5
+    * Encriptar utilizando bcrypt (más seguro) hash_password
+    * Hacer algo parecido para las tarjetas (las tarjetas se encriptan utilizando la contraseña de usuario como clabe) chiper_vulnerable.py
+    * Luego hacerlo de otro métodos utilizando "salting", explicando que el atacante debería saber el salt de cada una de las tarjetas chiper.py
+    * No significa que sea posible pero es mejor y lo hace más costoso en tiempo y recursos para un atacante
+- ¿Qué datos deberían ser confidenciales de acuerdo con las leyes de privacidad, requisitos reglamentarios o necesidades comerciales
+
+3. Inyección
+    - Secuencia de commandos en sitios cruzados
+    - Inyección SQL
+    - Control externo sobre archivos o ruta
+    DEMO:
     El login page es vulnerable a ataques de inyección SQL
-    Probar los siguientes ejemplos:
-    A. Esto iniciará sesión con la primer cuenta en la tabla users, en este caso es admin
-        username: ' OR 1=1 --
-        password: lo que sea
-        SELECT * FROM users WHERE username = '' OR '1'='1' AND password = 'anything'
-    B. Iniciar sesión como cualquier usuario sin necesidad de credenciales
-        usename: admin' -- (aquí se puede cambiar admin por un usuario existente como guest)
-        password: lo qu sea
-        SELECT * FROM users WHERE username = 'admin' -- ' AND password = ''
-    C. Eliminar la tabla usuarios (no funciona)
-        Username: admin'; DROP TABLE users; --
-        Password: (leave blank)
-        SELECT * FROM users WHERE username = 'admin'; DROP TABLE users; -- ' AND password = ''
+    * Inyección SQL:
+        A. Esto iniciará sesión con la primer cuenta en la tabla users, en este caso es admin
+            username: ' OR 1=1 --
+            password: lo que sea
+            SELECT * FROM users WHERE username = '' OR '1'='1' AND password = 'anything'
+        B. Iniciar sesión como cualquier usuario sin necesidad de credenciales
+            usename: admin' -- (aquí se puede cambiar admin por un usuario existente como guest)
+            password: lo qu sea
+            SELECT * FROM users WHERE username = 'admin' -- ' AND password = ''
+        C. Eliminar la tabla usuarios (no funciona)
+            Username: admin'; DROP TABLE users; --
+            Password: (leave blank)
+            SELECT * FROM users WHERE username = 'admin'; DROP TABLE users; -- ' AND password = ''
+        Esto trata a username y password como inputs cuando se ejecuta el query, en lugar de concatenarse y tratase como código
+        query = "SELECT * FROM users WHERE username = ? AND password = ?"
+        cursor.execute(query, (username, password))
+    * Inyección de commandos
+        Ir a la ruta /ping
+        La ruta ping ejecuta el comando ping hacia la IP especificada en el campo
+        El campo no esta protedigo, si ejecutas 127.0.0.1; ls (suponiendo que estamos en linux) esto permite ver archivos del sistema
+        PROBAR:
+        pwd
+        cat
+        ls
+        sudo cat /etc/shadow
+        ipconfig
+        Aquí deberiamos sanitizar la entrada, por ejemplo un regex que cheque si el input esta en formato de IP y escapado de simbolos
+    - Recomendar el uso de herramienta automatizadas de análisis de código SAST y DAST
 
-    SOLUCIÓN:
-    Esto trata a username y password como inputs cuando se ejecuta el query, en lugar de concatenarse y tratase como código
-    query = "SELECT * FROM users WHERE username = ? AND password = ?"
-    cursor.execute(query, (username, password))
+4. Diseño inseguro
+- Patrones de diseño y arquitecturas de referencia
+- Incluir seguridad en todas las fases (mover a la izquierda)
+- Diferencia importante entre diseño seguro e implementación segura (implementación perfecta sin diseño seguro no es segura)
+- Carretera pavimentada
+- Modelo de Madurez para el aseguramiento de software SAMM
+- Pruebas unitarias
 
-Información Innecesaria mostrada al usuario
-    Si intentamos hace login y ponemos algun caracter no permitido por SQL, por ejemplo ponemos ' en la contraseña
-    Esto mostrará un error que puede mostrar mucha información acerca de la aplicación y que el atacante puede explotar
-    Como el framwork utilizado, la estructura de la aplicación, e incluso parte del código que provocó el error
-    Esto se soluciona utilizando try, catch o Try, Exception en python 
+5. Configuración de seguridad incorrecta
+- Permisos mal configurados en servicios de la nube
+- Funciones innecesarias o instaladas, puertos, servicios, cuentas, prvivilegios innecesarios, etc.
+- Cuentras predeterminadas
+- Software desactualizado (relacionado con siguiente punto del top)
+- Errores demasiado informativos
+    DEMO:
+    Cuando flask informa de algún error y no se maneja, puede exponet un mensaje demasiado informativo
+    * En login, poner ' en la contraseña, esto expondrá el código que causó el problema
+    Información del servidor, framework que se utiliza, etc puede ser expuesto
+    * Soluciónar esto utilizanto try, except (similar a try, catch en js)
+- Proceso de configuración cordinado y repetible, automatizado es recomendable.
+- Configuración de entornos. Entornos se deben configurar de manera idéntica con diferentes credenciales c/u
+- Elimiar librerías, componentes o funciones no necesarias
+- Recomendar arquitectura de aplicación segmentada
+- Listado de directores no esta deshabilitado
+    * Mencionar de nuevo el ejercicio de inyección de comandos con el ejemplo de ls
+    
 
-Autorización
-    Se puede mostrar información a un usuario que no debería tener acceso a ella
-    Esto al modificar la URL, por ejemplo para ver el perfil de usuario de alguien más
-    También hay algunas rutas que deberían estar protegidas, por ejemplo el administrador es el unico que puede listar todos los usuarios
+6. Componentes vulnerables y desactializados
+- Uso de componentes de terceros no mantenidos
+- Sistema operativo, servidor de aplicaciones, el DBMS, aplicaciones, APIs y sus componentes, entornos y bibliotecas.
+- El software 'deprecado' ya no es mantenido y por lo tanto ya no se solucionan bugs o vulnerabilidades
+- Análisis de dependencias
+- Actualizar y revisar compatibilidad de las mismas
+- Eliminar dependencias no actualizadas
+- Inventario de componentes, OWASP depencency check
+- Componentes de fuentes oficiales únicamente
+- Los componentes normalmente se ejecutan con los mismos privilegios de la aplicación
+DEMO:
+    * Podemos regresar al ejemplo de la inyección de comandos, si el programa se ejecuta con permisos sudo, entonces el atacante no tiene límites
+    si es que no se deshabilitan funciones
+- IoT es difícil o imposible de parchar, pero son dispositivos críticos
 
-Contraseñas Inseguras
-    El signup no hace ninguna validación de contraseñas, puede ser cualquier cosa.
-    Se creó una funcion para validar las contraseñas en app/utils/passwords.py que regresa un boleano
+7. Fallas de Identificación y autenticación
+- Validación incorrecta de certificado (discrepancia de host)
+- Autenticación incorrecta
+    * Mencionar el ejemplo de inyección SQL
+- Fijación de sesiones
+- Invalidación incorrecta de sesiones de ususario o tokens de autenticación
+    DEMO:
+    * Cuando estemos autenticados, vamos a herramientas de desarrollador, y podemos copiar la sesión de la coockie
+    * Posteriormente dar logout y copiar esa sesión en la cookie vacía
+    * Si damos refresh deberíamos estar autenticados
+    Este es un ejemplo de invalidación incorrecta de sesiones
+    Las sesiones deben ser invalidadas después del cierre de sesión
+- Usuarios reutilizan las contraseñas en diferentes cuentas
+- Contraseñas inseguras
+    DEMO:
+    Cuando se crea una cuenta en el signup, no hay ninguna validación de los requisitos de contraseña
+    * usar la función is_valid_password
+    * Fuerza bruta ??? Ataques de diccionario ???
+- Procesos débiles de recuperación de contraseña (como cuestionarios)
+- También hacer mención de Fallas criptográficas
+- Exposición del identificador de la sesión en la URL
+- Mencionar MFA
+- Máximo de intentos de contraseña incorrecta, limitar tiempo entre intentos para frustrar al atacante
+- Políticas de largo, complejidad y rotación de contraseñas
 
-Fallas criptográficas
-    Las contraseñas son guardadas en la base de datos como texto plano
-    Se implementará una forma de hashear la contraseñas
-    Una idea es implementar un algoritmo debil y mostrar como se puede hackear una contraseña
+8. Fallas en el software y la integridad de los datos
+- Inclusión de funcionalidades provenientes de fuera de la zona de confianza
+- Ausencia de verificación de integridad en el código descargado
+- Deserialización de datos no confiables
+- Plugins, bibliotecas, módulos, repositorios o CDN no confiables (tiene que ver con Componentes Vulnerables)
+- CI/CD inseguro
+- Atacantes pueden crear sus propias actualizaciones y distribuirlas, lo que afecta a millones
+- Firmas digitales
+- Solo descargar de repositorios confiables, npm, maven, pip
+- Herramientas de análisis de componentes de terceros
+- Revisión de cambios y actualizaciones
+
+9. Fallas de registro y monitoreo
+
+10. Falcificación de solicitudes del lado del servidor

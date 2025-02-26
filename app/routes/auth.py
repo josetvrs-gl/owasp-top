@@ -47,10 +47,8 @@ def signup():
         username = request.form['username']
         password = request.form['password']
         
-        
         conn = get_db_connection()
         cursor = conn.cursor()
-        
         # Check if user exists
         query = "SELECT * FROM users WHERE username = ?"
         cursor.execute(query, (username,))
@@ -74,5 +72,5 @@ def signup():
 
 @auth.route('/logout', methods=['POST'])
 def logout():
-    session.clear()  # Clear session
-    return redirect(url_for('auth.login'))  # Redirect to login page
+    session.clear()
+    return redirect(url_for('auth.login'))

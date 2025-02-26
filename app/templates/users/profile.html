@@ -16,6 +16,10 @@
         {% else %}
         <p>User not Found</p>
         {% endif %}
+        <form action="{{ url_for('cards.user_cards') }}" method="GET">
+            <input type="hidden" name="user_id" value="{{ user[0] }}">
+            <button class="btn btn-primary" type="submit">Your Cards</button>
+        </form>
         <form action="{{ url_for('index.home') }}" method="GET">
             <button class="btn btn-primary" type="submit">HOME</button>
         </form>
